@@ -5,7 +5,7 @@
  * Falls back to accurate static data if the API is down.
  */
 
-import { getProductByHandle, getCheckoutUrl, type ShopifyProduct } from "@/lib/shopify";
+import { getProductByHandle, type ShopifyProduct } from "@/lib/shopify";
 
 // Branch → Shopify product handles
 const BRANCH_HANDLES: Record<string, string[]> = {
@@ -13,6 +13,9 @@ const BRANCH_HANDLES: Record<string, string[]> = {
   skin: ["hiro-h02-glow", "hiro-h03-restore"],
   physique: [],
 };
+
+// Shopify store domain for product page URLs
+const STORE_DOMAIN = "https://tepkuf-u1.myshopify.com";
 
 export interface ProductDisplay {
   id: string;
@@ -26,7 +29,7 @@ export interface ProductDisplay {
   imageAlt: string;
   availableForSale: boolean;
   variantId: number | null;
-  checkoutUrl: string;
+  productUrl: string;
   cta: string;
 }
 
@@ -57,6 +60,7 @@ function formatPrice(price: string): string {
 function mapToDisplay(product: ShopifyProduct): ProductDisplay {
   const variant = product.variants?.[0];
   const variantId = variant?.id || null;
+  const productUrl = `${STORE_DOMAIN}/products/${product.handle}`;
 
   return {
     id: String(product.id),
@@ -74,13 +78,13 @@ function mapToDisplay(product: ShopifyProduct): ProductDisplay {
     imageAlt: product.title,
     availableForSale: variant?.available ?? false,
     variantId,
-    checkoutUrl: variantId ? getCheckoutUrl(variantId) : "",
-    cta: product.title.includes("System") ? "View Bundle" : `Shop ${product.title}`,
+    productUrl,
+    cta: product.title.includes("System") ? "View bundle" : "View product",
   };
 }
 
 // Accurate fallback with real variant IDs from the store
-const FALLBACK_PRODUCTS: Record<string, ProductDisplay> = {
+export const FALLBACK_PRODUCTS: Record<string, ProductDisplay> = {
   "hiro-h01-root": {
     id: "47781995774115",
     name: "H01 Root Revival",
@@ -94,8 +98,8 @@ const FALLBACK_PRODUCTS: Record<string, ProductDisplay> = {
     imageAlt: "H01 Root Revival",
     availableForSale: true,
     variantId: 47781995774115,
-    checkoutUrl: "https://tepkuf-u1.myshopify.com/cart/47781995774115:1",
-    cta: "Shop H01",
+    productUrl: `${STORE_DOMAIN}/products/hiro-h01-root`,
+    cta: "View product",
   },
   "hiro-h02-glow": {
     id: "47781995348131",
@@ -110,8 +114,8 @@ const FALLBACK_PRODUCTS: Record<string, ProductDisplay> = {
     imageAlt: "H02 Morning Glow",
     availableForSale: true,
     variantId: 47781995348131,
-    checkoutUrl: "https://tepkuf-u1.myshopify.com/cart/47781995348131:1",
-    cta: "Shop H02",
+    productUrl: `${STORE_DOMAIN}/products/hiro-h02-glow`,
+    cta: "View product",
   },
   "hiro-h03-restore": {
     id: "47781995413667",
@@ -126,8 +130,8 @@ const FALLBACK_PRODUCTS: Record<string, ProductDisplay> = {
     imageAlt: "H03 Night Repair",
     availableForSale: true,
     variantId: 47781995413667,
-    checkoutUrl: "https://tepkuf-u1.myshopify.com/cart/47781995413667:1",
-    cta: "Shop H03",
+    productUrl: `${STORE_DOMAIN}/products/hiro-h03-restore`,
+    cta: "View product",
   },
 };
 
@@ -145,7 +149,6 @@ export async function getRecommendedProducts(
       .filter((p): p is ShopifyProduct => p !== null)
       .map(mapToDisplay);
   } catch {
-    // Fallback
     return handles
       .map((h) => FALLBACK_PRODUCTS[h])
       .filter(Boolean);
@@ -161,5 +164,3 @@ export async function getAllProducts(): Promise<ProductDisplay[]> {
     return Object.values(FALLBACK_PRODUCTS);
   }
 }
-
-export { FALLBACK_PRODUCTS };
