@@ -10,57 +10,31 @@ interface OptionCardProps {
   onClick: (value: string) => void;
 }
 
-export function OptionCard({
-  value,
-  label,
-  selected,
-  onClick,
-}: OptionCardProps) {
+export function OptionCard({ value, label, selected, onClick }: OptionCardProps) {
   return (
     <motion.button
       onClick={() => onClick(value)}
+      whileTap={{ scale: 0.99 }}
       className={cn(
-        "w-full text-left px-5 py-4 rounded-xl border transition-all duration-150 cursor-pointer",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0a0a0a]",
+        "w-full text-left px-5 py-4 rounded-xl transition-all duration-150 cursor-pointer border",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a9c5c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]",
         selected
-          ? "border-[#10b981] bg-[#d1fae5]/30 dark:bg-[#10b981]/10"
-          : "border-[#e5e7eb] dark:border-[#2a2a2a] bg-white dark:bg-[#111] hover:border-[#d1d5db] dark:hover:border-[#3a3a3a]"
+          ? "border-[#4a9c5c] bg-[rgba(74,156,92,0.08)]"
+          : "border-[rgba(255,255,255,0.07)] bg-[rgba(255,255,255,0.02)] hover:border-[rgba(255,255,255,0.14)] hover:bg-[rgba(255,255,255,0.04)]"
       )}
-      whileTap={{ scale: 0.985 }}
     >
-      <div className="flex items-start gap-3.5">
-        <div
-          className={cn(
-            "mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors",
-            selected
-              ? "border-[#10b981] bg-[#10b981]"
-              : "border-[#d1d5db] dark:border-[#3a3a3a]"
-          )}
-        >
-          {selected && (
-            <motion.svg
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="w-3 h-3 text-white"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={3}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </motion.svg>
-          )}
-        </div>
+      <div className="flex items-center gap-3.5">
+        {/* Selection indicator — left-side dot */}
         <span
           className={cn(
-            "text-[15px] leading-relaxed",
-            selected
-              ? "text-[#111] dark:text-white font-medium"
-              : "text-[#555] dark:text-[#a0a0a0]"
+            "w-2 h-2 rounded-full flex-shrink-0 transition-all duration-200",
+            selected ? "bg-[#4a9c5c] scale-110" : "bg-[rgba(255,255,255,0.15)]"
+          )}
+        />
+        <span
+          className={cn(
+            "text-[15px] leading-relaxed font-medium",
+            selected ? "text-[#f5f5f5]" : "text-[#8a8f98]"
           )}
         >
           {label}

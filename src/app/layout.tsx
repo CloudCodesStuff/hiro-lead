@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HIRO Protocol | Your Personalized Wellness Routine",
+  title: "HIRO Protocol | Your personalized wellness routine",
   description:
     "Answer a few questions about your lifestyle, goals, and challenges. We will create a personalized HIRO routine designed around your needs.",
 };
@@ -26,9 +26,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-[#111] dark:bg-[#0a0a0a] dark:text-[#f5f5f5]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fixed inset-0 bg-white dark:bg-[#0a0a0a] -z-10" />
         {children}
       </body>
     </html>

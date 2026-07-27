@@ -6,17 +6,23 @@ interface RoutineCardProps {
 
 export function RoutineCard({ routine }: RoutineCardProps) {
   return (
-    <div className="rounded-2xl p-5 sm:p-6 border border-[#e5e7eb] dark:border-[#1f1f1f] bg-white dark:bg-[#111]">
-      <h4 className="text-xs font-semibold text-[#10b981] mb-4">
+    <div
+      className="rounded-xl p-5 border"
+      style={{
+        background: "rgba(255,255,255,0.02)",
+        borderColor: "rgba(255,255,255,0.07)",
+      }}
+    >
+      <h4 className="text-[11px] font-semibold text-[#4a9c5c] tracking-[0.12em] mb-4">
         {routine.time}
       </h4>
       <ul className="space-y-3">
         {routine.items.map((item, i) => (
           <li
             key={i}
-            className="flex items-start gap-3 text-[15px] text-[#555] dark:text-[#a0a0a0] leading-relaxed"
+            className="flex items-start gap-3 text-[14px] text-[#8a8f98] leading-relaxed"
           >
-            <span className="text-[#10b981] mt-0.5 flex-shrink-0 font-mono text-xs">
+            <span className="text-[#4a9c5c] mt-0.5 flex-shrink-0 font-mono text-[11px] tabular-nums opacity-70">
               {String(i + 1).padStart(2, "0")}
             </span>
             <span>{item}</span>

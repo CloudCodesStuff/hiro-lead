@@ -15,7 +15,7 @@ const BRANCH_HANDLES: Record<string, string[]> = {
 };
 
 // Shopify store domain for product page URLs
-const STORE_DOMAIN = "https://tepkuf-u1.myshopify.com";
+const STORE_DOMAIN = "https://hiroprotocol.com";
 
 export interface ProductDisplay {
   id: string;

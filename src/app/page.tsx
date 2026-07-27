@@ -15,6 +15,23 @@ import {
   type ProductDisplay,
 } from "@/data/products";
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[11px] font-semibold text-[#4a9c5c] tracking-[0.14em] mb-4">
+      {children}
+    </p>
+  );
+}
+
+function Divider() {
+  return (
+    <div
+      className="my-8"
+      style={{ height: "1px", background: "rgba(255,255,255,0.06)" }}
+    />
+  );
+}
+
 function AssessmentFlow() {
   const {
     state,
@@ -33,7 +50,7 @@ function AssessmentFlow() {
       ? state.answers[currentQuestion.id]
       : null;
 
-  // Auto-advance loading -> result
+  // Auto-advance loading → result
   useEffect(() => {
     if (state.step === "loading") {
       const t = setTimeout(() => dispatch({ type: "SHOW_RESULT" }), 3800);
@@ -41,41 +58,32 @@ function AssessmentFlow() {
     }
   }, [state.step, dispatch]);
 
-  // Fetch products when results are shown
+  // Fetch products on result
   useEffect(() => {
     if (state.step === "result" && result && state.branch) {
       const handles = result.recommendedProductHandles;
-      if (handles.length === 0) {
-        setProducts([]);
-        return;
-      }
-
+      if (handles.length === 0) { setProducts([]); return; }
       getRecommendedProducts(state.branch)
         .then(setProducts)
         .catch(() => {
-          const fallbackList = handles
-            .map((h: string) => FALLBACK_PRODUCTS[h])
-            .filter(Boolean);
-          setProducts(fallbackList);
+          setProducts(
+            handles.map((h: string) => FALLBACK_PRODUCTS[h]).filter(Boolean)
+          );
         });
     }
   }, [state.step, result, state.branch]);
 
   return (
-    <main className="min-h-screen bg-white dark:bg-[#0a0a0a]">
+    <main className="min-h-screen" style={{ background: "#0a0a0a", color: "#f5f5f5" }}>
+      {/* Signature top rule */}
+      <div className="fixed top-0 left-0 right-0 h-[2px] z-50" style={{ background: "#4a9c5c" }} />
+
       <AnimatePresence mode="wait">
+
         {/* ---- HERO ---- */}
         {state.step === "hero" && (
-          <motion.div
-            key="hero"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <HeroSection
-              onStart={() => dispatch({ type: "START_ASSESSMENT" })}
-            />
+          <motion.div key="hero" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <HeroSection onStart={() => dispatch({ type: "START_ASSESSMENT" })} />
           </motion.div>
         )}
 
@@ -88,21 +96,20 @@ function AssessmentFlow() {
             exit={{ opacity: 0 }}
             className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
           >
-            <ProgressBar current={1} total={progress.total} />
-            <QuestionCard
-              questionId={currentQuestion.id}
-              text={currentQuestion.text}
-              subtitle={currentQuestion.subtitle}
-              options={currentQuestion.options}
-              selectedValue={selectedValue}
-              onSelect={(qId, val) => {
-                handleAnswer(qId, val);
-                dispatch({
-                  type: "SELECT_BRANCH",
-                  branch: val as "hair" | "skin" | "physique",
-                });
-              }}
-            />
+            <div className="w-full max-w-md mx-auto">
+              <ProgressBar current={1} total={progress.total} />
+              <QuestionCard
+                questionId={currentQuestion.id}
+                text={currentQuestion.text}
+                subtitle={currentQuestion.subtitle}
+                options={currentQuestion.options}
+                selectedValue={selectedValue}
+                onSelect={(qId, val) => {
+                  handleAnswer(qId, val);
+                  dispatch({ type: "SELECT_BRANCH", branch: val as "hair" | "skin" | "physique" });
+                }}
+              />
+            </div>
           </motion.div>
         )}
 
@@ -115,46 +122,37 @@ function AssessmentFlow() {
             exit={{ opacity: 0 }}
             className="min-h-screen flex flex-col items-center justify-center px-6 py-16"
           >
-            <ProgressBar current={progress.current} total={progress.total} />
-            <QuestionCard
-              questionId={currentQuestion.id}
-              text={currentQuestion.text}
-              subtitle={currentQuestion.subtitle}
-              options={currentQuestion.options}
-              selectedValue={selectedValue}
-              onSelect={(qId, val) => {
-                handleAnswer(qId, val);
-              }}
-            />
-
-            {selectedValue && (
-              <motion.button
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={handleNext}
-                className="mt-6 px-6 py-3 rounded-xl bg-[#111] dark:bg-white text-white dark:text-[#111] font-medium text-[15px] hover:bg-[#1f2937] dark:hover:bg-[#e5e5e5] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#0a0a0a]"
-              >
-                {progress.current >= progress.total - 1
-                  ? "See my results"
-                  : "Continue"}
-              </motion.button>
-            )}
+            <div className="w-full max-w-md mx-auto">
+              <ProgressBar current={progress.current} total={progress.total} />
+              <QuestionCard
+                questionId={currentQuestion.id}
+                text={currentQuestion.text}
+                subtitle={currentQuestion.subtitle}
+                options={currentQuestion.options}
+                selectedValue={selectedValue}
+                onSelect={(qId, val) => handleAnswer(qId, val)}
+              />
+              {selectedValue && (
+                <motion.button
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={handleNext}
+                  className="mt-6 w-full py-3.5 rounded-lg text-[15px] font-medium text-[#0a0a0a] transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4a9c5c] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a]"
+                  style={{ background: "#4a9c5c" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#3d8a4e")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "#4a9c5c")}
+                >
+                  {progress.current >= progress.total - 1 ? "See my results" : "Continue"}
+                </motion.button>
+              )}
+            </div>
           </motion.div>
         )}
 
         {/* ---- LOADING ---- */}
         {state.step === "loading" && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="min-h-screen flex items-center justify-center px-6"
-          >
-            <LoadingPersonalization
-              branch={state.branch}
-              answers={state.answers}
-            />
+          <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-h-screen flex items-center justify-center px-6">
+            <LoadingPersonalization branch={state.branch} answers={state.answers} />
           </motion.div>
         )}
 
@@ -162,42 +160,43 @@ function AssessmentFlow() {
         {state.step === "result" && result && (
           <motion.div
             key="result"
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="px-6 py-12 sm:py-16 max-w-2xl mx-auto"
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="px-6 py-14 sm:py-20 max-w-xl mx-auto pb-32"
           >
             {/* Header */}
-            <div className="mb-6">
+            <div className="mb-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/hiro-logo.png"
-                alt="HIRO Protocol"
-                className="h-5 mb-8 dark:invert"
-              />
-              <h1 className="text-[28px] sm:text-[34px] font-bold text-[#111] dark:text-white leading-[1.15] tracking-[-0.02em] mb-4">
+              <img src="/hiro-logo.png" alt="HIRO Protocol" className="h-5 mb-8 invert" />
+              <h1
+                className="text-[28px] sm:text-[34px] font-semibold text-[#f5f5f5] leading-[1.12] mb-3"
+                style={{ letterSpacing: "-0.025em" }}
+              >
                 {result.headline}
               </h1>
-              <p className="text-[#6b7280] dark:text-[#9ca3af] text-[17px] leading-relaxed max-w-lg">
+              <p className="text-[16px] text-[#8a8f98] leading-relaxed">
                 {result.copy}
               </p>
             </div>
 
-            <div className="border-t border-[#e5e7eb] dark:border-[#1f1f1f] my-8" />
+            <Divider />
 
-            {/* ---- CURRENT PROFILE ---- */}
+            {/* Profile */}
             <section className="mb-10">
-              <h2 className="text-xs font-semibold text-[#10b981] tracking-[0.05em] mb-5">
-                {result.profileSummary.label}
-              </h2>
-              <div className="space-y-3">
+              <SectionLabel>{result.profileSummary.label}</SectionLabel>
+              <div className="space-y-2.5">
                 {result.profileSummary.items.map((item, i) => (
                   <div
                     key={i}
-                    className="p-5 rounded-2xl border border-[#e5e7eb] dark:border-[#1f1f1f] bg-[#f9fafb] dark:bg-[#0d0d0d]"
+                    className="p-4 rounded-xl border"
+                    style={{
+                      background: "rgba(255,255,255,0.02)",
+                      borderColor: "rgba(255,255,255,0.07)",
+                    }}
                   >
-                    <p className="text-[15px] text-[#555] dark:text-[#a0a0a0] leading-relaxed">
+                    <p className="text-[14px] text-[#8a8f98] leading-relaxed">
                       {item.insight}
                     </p>
                   </div>
@@ -205,13 +204,11 @@ function AssessmentFlow() {
               </div>
             </section>
 
-            {/* ---- PRODUCTS — before the routine, highest CRO position ---- */}
+            {/* Products — highest CRO position */}
             {products.length > 0 && (
               <section className="mb-10">
-                <h2 className="text-xs font-semibold text-[#10b981] tracking-[0.05em] mb-2">
-                  Your HIRO recommendations
-                </h2>
-                <p className="text-[#6b7280] dark:text-[#9ca3af] text-[14px] leading-relaxed mb-5">
+                <SectionLabel>Your HIRO recommendations</SectionLabel>
+                <p className="text-[13px] text-[#62666d] mb-5 leading-relaxed">
                   Selected based on your answers.
                 </p>
                 <div className="space-y-4">
@@ -222,33 +219,32 @@ function AssessmentFlow() {
               </section>
             )}
 
-            <div className="border-t border-[#e5e7eb] dark:border-[#1f1f1f] my-8" />
+            <Divider />
 
-            {/* ---- RECOMMENDED ROUTINE ---- */}
+            {/* Routine */}
             <section className="mb-10">
-              <h2 className="text-xs font-semibold text-[#10b981] tracking-[0.05em] mb-5">
-                Your recommended routine
-              </h2>
-              <div className="space-y-4">
+              <SectionLabel>Your recommended routine</SectionLabel>
+              <div className="space-y-3">
                 <RoutineCard routine={result.morningRoutine} />
                 <RoutineCard routine={result.eveningRoutine} />
                 <RoutineCard routine={result.weeklyHabits} />
               </div>
             </section>
 
-            {/* ---- LIFESTYLE ---- */}
+            {/* Lifestyle */}
             <section className="mb-10">
-              <h2 className="text-xs font-semibold text-[#10b981] tracking-[0.05em] mb-5">
-                Lifestyle foundations
-              </h2>
-              <div className="rounded-2xl border border-[#e5e7eb] dark:border-[#1f1f1f] bg-white dark:bg-[#111] p-5 sm:p-6">
+              <SectionLabel>Lifestyle foundations</SectionLabel>
+              <div
+                className="rounded-xl p-5 border"
+                style={{
+                  background: "rgba(255,255,255,0.02)",
+                  borderColor: "rgba(255,255,255,0.07)",
+                }}
+              >
                 <ul className="space-y-3">
                   {result.lifestyleSuggestions.map((s, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-3 text-[15px] text-[#555] dark:text-[#a0a0a0] leading-relaxed"
-                    >
-                      <span className="text-[#10b981] mt-0.5 flex-shrink-0 font-mono text-xs tabular-nums">
+                    <li key={i} className="flex items-start gap-3 text-[14px] text-[#8a8f98] leading-relaxed">
+                      <span className="text-[#4a9c5c] mt-0.5 flex-shrink-0 font-mono text-[11px] tabular-nums opacity-70">
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       {s}
@@ -258,58 +254,57 @@ function AssessmentFlow() {
               </div>
             </section>
 
-            {/* ---- WHY THIS FITS ---- */}
+            {/* Why this fits */}
             <section className="mb-10">
-              <h2 className="text-xs font-semibold text-[#10b981] tracking-[0.05em] mb-5">
-                Why this routine fits you
-              </h2>
-              <ul className="space-y-3">
+              <SectionLabel>Why this routine fits you</SectionLabel>
+              <ul className="space-y-2.5">
                 {result.whyThisFits.map((reason, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-3 text-[15px] text-[#555] dark:text-[#a0a0a0] leading-relaxed"
-                  >
-                    <span className="text-[#10b981] mt-0.5 flex-shrink-0">
-                      &#8212;
-                    </span>
+                  <li key={i} className="flex items-start gap-3 text-[14px] text-[#8a8f98] leading-relaxed">
+                    <span className="text-[#4a9c5c] mt-0.5 flex-shrink-0 text-[11px]">—</span>
                     {reason}
                   </li>
                 ))}
               </ul>
             </section>
 
-            {/* ---- STICKY BOTTOM CTA (products only) ---- */}
-            {products.length > 0 && (
-              <div className="sticky bottom-0 bg-white/90 dark:bg-[#0a0a0a]/90 backdrop-blur-sm border-t border-[#e5e7eb] dark:border-[#1f1f1f] -mx-6 px-6 py-4">
-                <a
-                  href={products[0].productUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#111] dark:bg-white text-white dark:text-[#111] font-medium text-[15px] hover:bg-[#1f2937] dark:hover:bg-[#e5e5e5] transition-colors"
-                >
-                  Shop your protocol
-                  <svg
-                    className="w-4 h-4 opacity-60"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </a>
-              </div>
-            )}
-
-            {/* ---- FOOTER ---- */}
-            <div className="text-center py-10">
-              <p className="text-[13px] text-[#9ca3af] dark:text-[#555]">
+            {/* Footer */}
+            <div className="text-center pt-4">
+              <p className="text-[12px] text-[#3e3e44]">
                 HIRO Protocol. Simple routines, real results.
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ---- STICKY BOTTOM CTA ---- */}
+      {state.step === "result" && products.length > 0 && (
+        <div
+          className="fixed bottom-0 left-0 right-0 z-40 px-4 py-4"
+          style={{
+            background: "rgba(10,10,10,0.92)",
+            backdropFilter: "blur(12px)",
+            borderTop: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          <div className="max-w-xl mx-auto">
+            <a
+              href={products[0].productUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3.5 rounded-lg text-[15px] font-medium text-[#0a0a0a] transition-colors"
+              style={{ background: "#4a9c5c" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "#3d8a4e")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "#4a9c5c")}
+            >
+              Shop your protocol
+              <svg className="w-4 h-4 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
